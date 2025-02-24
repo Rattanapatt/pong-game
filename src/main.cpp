@@ -1,6 +1,7 @@
 #include <iostream>
 #include <raylib.h>
 #include <ctime>
+#include <string>
 
 using namespace std;
 
@@ -10,16 +11,34 @@ int cpu_score = 0;
 Sound oh_sound;
 Sound bruh_sound;
 
+Color White = {255, 255, 255, 255};    
+Color Green = {0, 255, 0, 255};    
+Color Blue = {130, 130, 255, 255};         
+Color LightBlue = {173, 216, 255, 255}; 
+Color Red = {255, 0, 0, 255};          
+Color Yellow = {255, 255, 0, 255};     
+Color Orange = {255, 165, 0, 255};     
+Color Pink = {255, 192, 203, 255};
+
+Color colors[] = {White, Green, Blue, LightBlue, Red, Yellow, Orange, Pink};
+
 class Ball 
 {
     public:
     float x, y;
     int speed_x, speed_y;
     int radius;
+    Color color = colors[0];
 
     void Draw()
     {
-        DrawCircle(x, y, radius, WHITE); // Ball
+        DrawCircle(x, y, radius, color); // Ball
+    }
+
+    void ChangeColor()
+    {
+        int numColors = sizeof(colors) / sizeof(colors[0]);
+        color = colors[GetRandomValue(0, numColors - 1)];
     }
 
     void Update()
@@ -30,7 +49,9 @@ class Ball
         if (y + radius >= GetScreenHeight() || y - radius <= 0)
         {
             speed_y *= -1;
+            SetSoundVolume(bruh_sound, 0.1f);
             PlaySound(bruh_sound);
+            ChangeColor();
         }
         
         // Scoring
@@ -38,12 +59,14 @@ class Ball
         {
             player_score++;
             ResetBall();
+            SetSoundVolume(oh_sound, 0.1f);
             PlaySound(oh_sound);
         }
         if (x + radius >= GetScreenWidth())
         {
             cpu_score++;
             ResetBall();
+            SetSoundVolume(oh_sound, 0.1f);
             PlaySound(oh_sound);
         }
     }
@@ -131,7 +154,7 @@ int main()
     InitWindow(screen_width, screen_height, "My Pong Game!");
     SetTargetFPS(60);
     InitAudioDevice();
-
+    
     bruh_sound = LoadSound("src/bruh.wav");
     oh_sound = LoadSound("src/oh.wav");
 
