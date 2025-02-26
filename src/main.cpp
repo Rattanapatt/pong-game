@@ -35,10 +35,21 @@ class Ball
         DrawCircle(x, y, radius, color); // Ball
     }
 
+    bool CompareColor(Color c1, Color c2)
+    {
+        return (c1.r == c2.r) && (c1.g == c2.g) && (c1.b == c2.b) && (c1.a == c2.a);
+    }
+
     void ChangeColor()
     {
         int numColors = sizeof(colors) / sizeof(colors[0]);
-        color = colors[GetRandomValue(0, numColors - 1)];
+        Color new_color = color;
+        do {
+            new_color = colors[GetRandomValue(0, numColors - 1)];
+        }
+        while (CompareColor(color, new_color));
+
+        color = new_color;
     }
 
     void Update()
@@ -79,6 +90,8 @@ class Ball
         int speed_choices[2] = {-1, 1};
         speed_x *= speed_choices[GetRandomValue(0, 1)];
         speed_y *= speed_choices[GetRandomValue(0, 1)];
+
+        color = colors[0];
     }
 };
 
@@ -192,11 +205,13 @@ int main()
         {
             ball.speed_x *= -1;
             PlaySound(bruh_sound);
+            ball.ChangeColor();
         }
         if (CheckCollisionCircleRec(Vector2{ball.x, ball.y}, ball.radius, Rectangle{cpu.x, cpu.y, cpu.width, cpu.height}))
         {
             ball.speed_x *= -1;
             PlaySound(bruh_sound);
+            ball.ChangeColor();
         }
         
         // Update before clear
